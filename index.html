@@ -188,5 +188,49 @@ let courses=[["Virtual Assistant","Email, calendar, admin tasks"],["Data Entry &
 document.getElementById('trainContent').innerHTML=courses.map(c=>`<div class="border p-4 rounded mt-3"><b>${c[0]}</b><p>${c[1]}</p></div>`).join('');
 let p=new URLSearchParams(location.search); if(p.get('ref')) setTimeout(()=>{let el=document.getElementById('suRef'); if(el) el.value=p.get('ref')},500);
 </script>
+  <script>
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hide'));
+  document.getElementById(id).classList.remove('hide');
+  window.scrollTo(0,0);
+}
+
+function doSignup(){
+  var name = document.getElementById('suName').value.trim();
+  var phone = document.getElementById('suPhone').value.trim();
+  var email = document.getElementById('suEmail').value.trim().toLowerCase();
+  var pass = document.getElementById('suPass').value.trim();
+  var ref = document.getElementById('suRef') ? document.getElementById('suRef').value.trim() : '';
+
+  if(!name || !phone || !email || !pass){
+    alert('Please fill Name, Phone, Email and Password');
+    return;
+  }
+  var users = JSON.parse(localStorage.getItem('nrh_users') || '[]');
+  if(users.find(u=>u.email===email)){
+    alert('This email already registered! Please Login.');
+    show('login');
+    return;
+  }
+  users.push({name:name, phone:phone, email:email, pass:pass, ref:ref, date:new Date().toLocaleDateString()});
+  localStorage.setItem('nrh_users', JSON.stringify(users));
+  localStorage.setItem('nrh_current', email);
+  alert('✅ Success! Welcome '+name+'. You are registered!');
+  show('login');
+}
+
+function doLogin(){
+  var email = document.getElementById('liEmail').value.trim().toLowerCase();
+  var pass = document.getElementById('liPass').value.trim();
+  var users = JSON.parse(localStorage.getItem('nrh_users') || '[]');
+  var user = users.find(u=>u.email===email && u.pass===pass);
+  if(user){
+    localStorage.setItem('nrh_current', email);
+    alert('Welcome back '+user.name+' 👋');
+  } else {
+    alert('Wrong email or password. Please Signup first.');
+  }
+}
+</script>
 </body>
 </html>
