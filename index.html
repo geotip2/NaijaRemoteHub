@@ -224,9 +224,14 @@ function doLogin(){
   var pass = document.getElementById('liPass').value.trim();
   var users = JSON.parse(localStorage.getItem('nrh_users') || '[]');
   var user = users.find(u=>u.email===email && u.pass===pass);
-  if(user){
+    if(user){
     localStorage.setItem('nrh_current', email);
     alert('Welcome back '+user.name+' 👋');
+    show('dashboard');
+    var nameEl = document.getElementById('dashName');
+    if(nameEl) nameEl.innerText = user.name;
+    var emailEl = document.getElementById('dashEmail');
+    if(emailEl) emailEl.innerText = user.email;
   } else {
     alert('Wrong email or password. Please Signup first.');
   }
