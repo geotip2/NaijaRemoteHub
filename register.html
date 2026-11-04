@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register - NaijaRemoteHub</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;display:flex;justify-content:center;padding:20px}
+.box{background:#1e293b;padding:25px;border-radius:15px;width:100%;max-width:380px}
+input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;box-sizing:border-box}
+button{width:100%;padding:13px;background:#22c55e;border:none;border-radius:8px;font-weight:bold}
+a{color:#22c55e}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🇳🇬 Join NaijaRemoteHub</h2>
+<p>Create your free account</p>
+<input id="name" placeholder="Full Name">
+<input id="email" type="email" placeholder="Email">
+<input id="phone" placeholder="Phone / WhatsApp">
+<select id="type">
+<option value="Freelancer">I am a Freelancer</option>
+<option value="Employer">I am an Employer</option>
+</select>
+<input id="pass" type="password" placeholder="Create Password">
+<button onclick="register()">Register Now</button>
+<p id="msg"></p>
+<p>Already have account? <a href="admin.html">Login as Admin</a></p>
+<p><a href="index.html">← Back to Home</a></p>
+</div>
+<script>
+function register(){
+  var name=document.getElementById('name').value.trim();
+  var email=document.getElementById('email').value.trim().toLowerCase();
+  var phone=document.getElementById('phone').value.trim();
+  var type=document.getElementById('type').value;
+  var pass=document.getElementById('pass').value.trim();
+  if(!name || !email || !pass){ document.getElementById('msg').innerHTML="Please fill Name, Email and Password"; return; }
+  var users = JSON.parse(localStorage.getItem('nrh_users') || '[]');
+  if(users.find(u=>u.email===email)){ document.getElementById('msg').innerHTML="This email already registered!"; return; }
+  users.push({name:name,email:email,phone:phone,type:type,pass:pass,date:new Date().toLocaleDateString()});
+  localStorage.setItem('nrh_users', JSON.stringify(users));
+  document.getElementById('msg').innerHTML="<b style='color:#22c55e'>✅ Success! Welcome "+name+". You are registered!</b>";
+}
+</script>
+</body>
+</html>
