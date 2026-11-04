@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Login - NaijaRemoteHub</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
+.box{background:#1e293b;padding:30px;border-radius:15px;width:90%;max-width:350px;text-align:center}
+input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;box-sizing:border-box}
+button{width:100%;padding:12px;background:#22c55e;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+#dashboard{display:none}
+.card{background:#334155;padding:15px;border-radius:10px;margin:10px 0;text-align:left}
+a{color:#22c55e}
+</style>
+</head>
+<body>
 
+<div class="box" id="loginBox">
+<h2>🇳🇬 NaijaRemoteHub</h2>
+<p>Admin Login</p>
+<input id="email" type="email" placeholder="Admin Email" value="naijaremotehub@gmail.com">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="error" style="color:#f87171"></p>
+<p style="font-size:12px">Demo Password: <b>Admin123</b><br>Change it in the code after</p>
+</div>
+
+<div class="box" id="dashboard">
+<h2>Welcome Admin 👋</h2>
+<p>naijaremotehub@gmail.com</p>
+<div class="card">📊 <b>Total Visitors:</b> 128</div>
+<div class="card">💼 <b>Job Posts:</b> 12</div>
+<div class="card">👥 <b>Freelancers:</b> 45</div>
+<div class="card">✏️ <a href="https://github.com/geotip2/NaijaRemoteHub" target="_blank">Edit Website on GitHub</a></div>
+<div class="card">🌐 <a href="index.html">View Live Site</a></div>
+<button onclick="logout()" style="background:#ef4444;color:white">Logout</button>
+</div>
+
+<script>
+function login(){
+  var email = document.getElementById('email').value;
+  var pass = document.getElementById('pass').value;
+  // CHANGE YOUR PASSWORD HERE - replace Admin123 with your own
+  if(email === 'naijaremotehub@gmail.com' && pass === 'Admin123'){
+    localStorage.setItem('nrh_admin','loggedin');
+    showDashboard();
+  } else {
+    document.getElementById('error').innerText = 'Wrong email or password';
+  }
+}
+function showDashboard(){
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+}
+function logout(){
+  localStorage.removeItem('nrh_admin');
+  location.reload();
+}
+if(localStorage.getItem('nrh_admin')==='loggedin'){ showDashboard(); }
+</script>
+</body>
+</html>
