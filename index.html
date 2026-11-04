@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NaijaRemoteHub - Learn Remote Work. Earn While You Learn.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>.hide{display:none}</style>
+</head>
+<body class="bg-white">
+
+<!-- ============ PASTE YOUR KEYS HERE ONLY ============ -->
+<script>
+const CONFIG = {
+  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co", // From Supabase > Settings > API
+  SUPABASE_KEY: "YOUR-ANON-KEY", // From Supabase > Settings > API > anon public
+  PAYSTACK_KEY: "pk_live_xxxxxxxxxxxxxxxx", // From Paystack > Settings > API Keys
+  ADMIN_EMAIL: "naijaremotehub@gmail.com",
+  FEE: 25000, L1: 8000, L2: 4000, L3: 2000, MIN_WITHDRAW: 5000
+};
+const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+let currentUser = null;
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hide'));
+  document.getElementById(id).classList.remove('hide'); window.scrollTo(0,0);
+  if(id==='dashboard') renderDash();
+  if(id==='referrals') renderRefs();
+  if(id==='wallet') renderWallet();
+  if(id==='admin') renderAdmin();
+}
+function genCode(){return 'NRH-'+Math.random().toString(36).substring(2,7).toUpperCase()}
+</script>
+
+<nav class="bg-[#0A7A42] text-white p-4 flex justify-between sticky top-0 z-50">
+  <b onclick="show('home')" class="cursor-pointer">🇳🇬 NaijaRemoteHub</b>
+  <div class="flex gap-3 text-sm"><button onclick="show('home')">Home</button><button onclick="show('login')">Login</button><button onclick="show('dashboard')" class="bg-[#FFC107] text-black px-3 py-1 rounded font-bold">Dashboard</button></div>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="page">
+  <div class="bg-[#0A7A42] text-white text-center p-8">
+    <h1 class="text-3xl md:text-5xl font-bold">Learn Remote Work.<br>Earn While You Learn.</h1>
+    <p class="mt-4">Join Nigerians learning to work online and earn from home.</p>
+    <button onclick="show('signup')" class="bg-[#FFC107] text-black px-8 py-3 rounded-full font-bold mt-6">JOIN NOW - ₦25,000</button>
+  </div>
+  <div class="p-6 max-w-3xl mx-auto">
+    <h2 class="text-2xl font-bold text-center">How It Works</h2>
+    <div class="grid md:grid-cols-3 gap-4 mt-4">
+      <div class="border p-4 rounded"><b>1. Register</b><p>Sign up & pay ₦25,000</p></div>
+      <div class="border p-4 rounded"><b>2. Learn</b><p>Instant access to training</p></div>
+      <div class="border p-4 rounded"><b>3. Earn</b><p>Share link, earn commissions</p></div>
+    </div>
+    <div class="bg-yellow-50 border p-4 rounded mt-6 text-center"><b>EARNINGS:</b> Level 1 ₦8,000 | Level 2 ₦4,000 | Level 3 ₦2,000</div>
+    <h2 class="text-2xl font-bold mt-8">What You Will Learn</h2>
+    <ul class="list-disc pl-5 mt-2"><li>Virtual Assistant</li><li>Data Entry & Admin</li><li>Customer Service Remote</li><li>Social Media Management</li><li>CV for Remote Jobs</li><li>Upwork & LinkedIn</li></ul>
+    <button onclick="show('signup')" class="w-full bg-[#0A7A42] text-white py-3 rounded mt-8 font-bold">JOIN NOW</button>
+    <p class="text-center text-sm mt-3">naijaremotehub@gmail.com</p>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div id="signup" class="page hide p-6 max-w-md mx-auto">
+  <h2 class="text-2xl font-bold">Create Account</h2>
+  <input id="suName" placeholder="Full Name" class="w-full border p-3 rounded mt-4">
+  <input id="suPhone" placeholder="Phone" class="w-full border p-3 rounded mt-2">
+  <input id="suEmail" placeholder="Email" class="w-full border p-3 rounded mt-2">
+  <input id="suPass" type="password" placeholder="Password" class="w-full border p-3 rounded mt-2">
+  <input id="suRef" placeholder="Referral Code (optional)" class="w-full border p-3 rounded mt-2">
+  <button onclick="doSignup()" class="w-full bg-[#0A7A42] text-white py-3 rounded mt-4 font-bold">Sign Up & Pay ₦25,000</button>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="page hide p-6 max-w-md mx-auto">
+  <h2 class="text-2xl font-bold">Login</h2>
+  <input id="liEmail" placeholder="Email" class="w-full border p-3 rounded mt-4">
+  <input id="liPass" type="password" placeholder="Password" class="w-full border p-3 rounded mt-2">
+  <button onclick="doLogin()" class="w-full bg-[#0A7A42] text-white py-3 rounded mt-4 font-bold">Login</button>
+</div>
+
+<!-- PAYMENT -->
+<div id="payment" class="page hide p-6 max-w-md mx-auto text-center">
+  <h2 class="text-2xl font-bold">Pay ₦25,000</h2>
+  <button onclick="payNow()" class="w-full bg-[#FFC107] py-3 rounded mt-6 font-bold">PAY WITH PAYSTACK</button>
+  <button onclick="completePayment()" class="w-full border py-3 rounded mt-2 text-sm">Test Payment (Demo)</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page hide p-6 max-w-2xl mx-auto">
+  <h2 class="text-2xl font-bold">My Dashboard</h2><p id="dashName"></p>
+  <div class="grid grid-cols-2 gap-3 mt-4"><div class="bg-green-100 p-4 rounded"><b>Wallet</b><p id="dashWallet" class="text-2xl font-bold">₦0</p></div><div class="bg-yellow-100 p-4 rounded"><b>Referrals</b><p id="dashRefs" class="text-2xl font-bold">0</p></div></div>
+  <div class="border p-4 rounded mt-4"><b>My Referral Link</b><p id="dashLink" class="text-xs break-all bg-gray-100 p-2 mt-2"></p><button onclick="copyLink()" class="bg-[#0A7A42] text-white px-4 py-2 rounded mt-2">Copy Code</button><p>Code: <b id="dashCode"></b></p></div>
+  <div class="grid grid-cols-3 gap-2 mt-4 text-center"><div class="border p-2 rounded">L1<br><b id="l1c">0</b></div><div class="border p-2 rounded">L2<br><b id="l2c">0</b></div><div class="border p-2 rounded">L3<br><b id="l3c">0</b></div></div>
+  <button onclick="show('wallet')" class="w-full bg-[#0A7A42] text-white py-3 rounded mt-4 font-bold">Withdraw</button>
+  <button onclick="show('training')" class="w-full bg-black text-white py-3 rounded mt-2">Training</button>
+  <button onclick="show('referrals')" class="w-full border py-2 rounded mt-2">My Referrals</button>
+</div>
+
+<div id="referrals" class="page hide p-6 max-w-2xl mx-auto"><h2 class="text-2xl font-bold">My Referrals</h2><div id="refList" class="mt-4"></div></div>
+<div id="wallet" class="page hide p-6 max-w-md mx-auto"><h2 class="text-2xl font-bold">Withdraw</h2><p>Balance: <b id="walletBal"></b></p><input id="wBank" placeholder="Bank Name" class="w-full border p-3 rounded mt-4"><input id="wAcc" placeholder="Account Number" class="w-full border p-3 rounded mt-2"><input id="wName" placeholder="Account Name" class="w-full border p-3 rounded mt-2"><input id="wAmt" type="number" placeholder="Amount Min 5000" class="w-full border p-3 rounded mt-2"><button onclick="doWithdraw()" class="w-full bg-[#0A7A42] text-white py-3 rounded mt-4 font-bold">Request Withdrawal</button><div id="withdrawHistory" class="mt-4"></div></div>
+<div id="training" class="page hide p-6 max-w-2xl mx-auto"><h2 class="text-2xl font-bold">Training</h2><div id="trainContent"></div></div>
+<div id="admin" class="page hide p-6 max-w-3xl mx-auto"><h2 class="text-2xl font-bold">Admin Dashboard</h2><div id="adminStats" class="mt-4"></div><h3 class="font-bold mt-6">Users</h3><div id="adminUsers"></div><h3 class="font-bold mt-6">Withdrawals</h3><div id="adminWithdraws"></div></div>
+
+<script>
+async function doSignup(){
+  const name=document.getElementById('suName').value, phone=document.getElementById('suPhone').value, email=document.getElementById('suEmail').value.toLowerCase(), pass=document.getElementById('suPass').value, ref=document.getElementById('suRef').value.trim().toUpperCase();
+  if(!name||!email||!pass) return alert('Fill all');
+  const code=genCode();
+  const {data,error}=await supabaseClient.from('users').insert([{name,phone,email,pass,code,ref,paid:false,wallet:0}]).select().single();
+  if(error) return alert(error.message);
+  currentUser=data; localStorage.setItem('nrh_user',JSON.stringify(data)); show('payment');
+}
+async function doLogin(){
+  const email=document.getElementById('liEmail').value.toLowerCase(), pass=document.getElementById('liPass').value;
+  const {data,error}=await supabaseClient.from('users').select('*').eq('email',email).eq('pass',pass).single();
+  if(error||!data) return alert('Wrong email/password');
+  currentUser=data; localStorage.setItem('nrh_user',JSON.stringify(data));
+  if(email===CONFIG.ADMIN_EMAIL) show('admin'); else if(!data.paid) show('payment'); else show('dashboard');
+}
+function payNow(){
+  if(CONFIG.PAYSTACK_KEY.includes('xxxx')) return alert('Add Paystack Key in CONFIG, or use Test Payment');
+  let h=PaystackPop.setup({key:CONFIG.PAYSTACK_KEY,email:currentUser.email,amount:CONFIG.FEE*100,callback:()=>completePayment(),onClose:()=>alert('Cancelled')}); h.openIframe();
+}
+async function completePayment(){
+  // Mark paid
+  await supabaseClient.from('users').update({paid:true}).eq('id',currentUser.id);
+  // Pay referrers
+  if(currentUser.ref){
+    const {data:l1}=await supabaseClient.from('users').select('*').eq('code',currentUser.ref).single();
+    if(l1){ await supabaseClient.from('users').update({wallet:l1.wallet+CONFIG.L1}).eq('id',l1.id);
+      if(l1.ref){ const {data:l2}=await supabaseClient.from('users').select('*').eq('code',l1.ref).single();
+        if(l2){ await supabaseClient.from('users').update({wallet:l2.wallet+CONFIG.L2}).eq('id',l2.id);
+          if(l2.ref){ const {data:l3}=await supabaseClient.from('users').select('*').eq('code',l2.ref).single();
+            if(l3) await supabaseClient.from('users').update({wallet:l3.wallet+CONFIG.L3}).eq('id',l3.id);
+          }
+        }
+      }
+    }
+  }
+  alert('Payment Successful! Referrers Paid.'); show('dashboard');
+}
+async function refreshUser(){
+  const {data}=await supabaseClient.from('users').select('*').eq('id',currentUser.id).single(); if(data){currentUser=data; localStorage.setItem('nrh_user',JSON.stringify(data));}
+}
+async function renderDash(){
+  if(!currentUser) currentUser=JSON.parse(localStorage.getItem('nrh_user')||'null'); if(!currentUser) return show('login');
+  await refreshUser();
+  const {data:all}=await supabaseClient.from('users').select('*');
+  let l1=all.filter(u=>u.ref===currentUser.code), l2=[], l3=[];
+  l1.forEach(a=>{ all.filter(u=>u.ref===a.code).forEach(b=>{l2.push(b); all.filter(u=>u.ref===b.code).forEach(c=>l3.push(c))})});
+  document.getElementById('dashName').innerText='Hello '+currentUser.name;
+  document.getElementById('dashWallet').innerText='₦'+currentUser.wallet.toLocaleString();
+  document.getElementById('dashRefs').innerText=l1.length+l2.length+l3.length;
+  document.getElementById('l1c').innerText=l1.length; document.getElementById('l2c').innerText=l2.length; document.getElementById('l3c').innerText=l3.length;
+  document.getElementById('dashCode').innerText=currentUser.code;
+  document.getElementById('dashLink').innerText=location.origin+location.pathname+'?ref='+currentUser.code;
+}
+function copyLink(){navigator.clipboard.writeText(currentUser.code); alert('Copied: '+currentUser.code)}
+async function renderRefs(){
+  const {data:all}=await supabaseClient.from('users').select('*');
+  let l1=all.filter(u=>u.ref===currentUser.code); let html='';
+  l1.forEach(u=>html+=`<div class="border p-3 rounded mb-2">L1 - ${u.name} - ₦8,000</div>`);
+  l1.forEach(a=>all.filter(u=>u.ref===a.code).forEach(u=>html+=`<div class="border p-3 rounded mb-2">L2 - ${u.name} - ₦4,000</div>`));
+  document.getElementById('refList').innerHTML=html||'No referrals yet';
+}
+async function renderWallet(){
+  await refreshUser(); document.getElementById('walletBal').innerText='₦'+currentUser.wallet.toLocaleString();
+  const {data}=await supabaseClient.from('withdrawals').select('*').eq('email',currentUser.email).order('created_at',{ascending:false});
+  document.getElementById('withdrawHistory').innerHTML=(data||[]).map(w=>`<div class="border p-2 rounded mb-2">₦${w.amount} - ${w.bank} - ${w.status}</div>`).join('')||'None';
+}
+async function doWithdraw(){
+  await refreshUser(); let amt=parseInt(document.getElementById('wAmt').value);
+  if(amt<CONFIG.MIN_WITHDRAW) return alert('Min ₦5,000'); if(amt>currentUser.wallet) return alert('Insufficient');
+  await supabaseClient.from('users').update({wallet:currentUser.wallet-amt}).eq('id',currentUser.id);
+  await supabaseClient.from('withdrawals').insert([{email:currentUser.email,amount:amt,bank:document.getElementById('wBank').value,acc:document.getElementById('wAcc').value,name:document.getElementById('wName').value,status:'Pending'}]);
+  alert('Withdrawal Requested'); renderWallet();
+}
+async function renderAdmin(){
+  if(!currentUser || currentUser.email!==CONFIG.ADMIN_EMAIL) return show('login');
+  const {data:users}=await supabaseClient.from('users').select('*'); const {data:ws}=await supabaseClient.from('withdrawals').select('*');
+  let rev=users.filter(u=>u.paid).length*25000;
+  document.getElementById('adminStats').innerHTML=`Users: ${users.length} | Revenue: ₦${rev.toLocaleString()} | Pending: ${ws.filter(w=>w.status==='Pending').length}`;
+  document.getElementById('adminUsers').innerHTML=users.map(u=>`<div class="border p-2 rounded mb-1">${u.name} - ${u.email} - Paid:${u.paid?'Yes':'No'} - Wallet ₦${u.wallet} - Ref:${u.ref||'None'} - Code:${u.code}</div>`).join('');
+  document.getElementById('adminWithdraws').innerHTML=ws.map(w=>`<div class="border p-2 rounded mb-1">${w.email} - ₦${w.amount} - ${w.bank} ${w.acc} - ${w.status} <button onclick="approveW('${w.id}')" class="bg-green-600 text-white px-2 rounded">Approve</button></div>`).join('')||'None';
+}
+async function approveW(id){ await supabaseClient.from('withdrawals').update({status:'Approved'}).eq('id',id); renderAdmin(); }
+let courses=[["Virtual Assistant","Email, calendar, admin tasks"],["Data Entry & Admin","Excel, Sheets, typing"],["Customer Service Remote","Chat, email support"],["Social Media Management","Content, Canva"],["CV for Remote Jobs","CV that gets interviews"],["Apply on Upwork & LinkedIn","Profile + proposals"]];
+document.getElementById('trainContent').innerHTML=courses.map(c=>`<div class="border p-4 rounded mt-3"><b>${c[0]}</b><p>${c[1]}</p></div>`).join('');
+let p=new URLSearchParams(location.search); if(p.get('ref')) setTimeout(()=>{let el=document.getElementById('suRef'); if(el) el.value=p.get('ref')},500);
+</script>
+</body>
+</html>
