@@ -38,8 +38,9 @@ a{color:#22c55e}
 
 <script>
 function login(){
-  var email = document.getElementById('email').value;
-  var pass = document.getElementById('pass').value;
+  function login(){
+  var email = document.getElementById('email').value.trim().toLowerCase();
+  var pass = document.getElementById('pass').value.trim();;
   // CHANGE YOUR PASSWORD HERE - replace Admin123 with your own
   if(email === 'naijaremotehub@gmail.com' && pass === 'Admin123'){
     localStorage.setItem('nrh_admin','loggedin');
