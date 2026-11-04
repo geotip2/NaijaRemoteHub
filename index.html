@@ -211,8 +211,8 @@ function doSignup(){
     alert('This email already registered! Please Login.');
     show('login');
     return;
-  }
-  users.push({name:name, phone:phone, email:email, pass:pass, ref:ref, date:new Date().toLocaleDateString()});
+  }var myCode = (name.split(' ')[0].toUpperCase().replace(/[^A-Z]/g,'') + Math.floor(1000 + Math.random()*9000));
+users.push({name:name, phone:phone, email:email, pass:pass, ref:ref, myCode:myCode, wallet:0, referrals:0, date:new Date().toLocaleDateString()});, date:new Date().toLocaleDateString()});
   localStorage.setItem('nrh_users', JSON.stringify(users));
   localStorage.setItem('nrh_current', email);
   alert('✅ Success! Welcome '+name+'. You are registered!');
@@ -225,7 +225,13 @@ function doLogin(){
   var users = JSON.parse(localStorage.getItem('nrh_users') || '[]');
   var user = users.find(u=>u.email===email && u.pass===pass);
     if(user){
-    localStorage.setItem('nrh_current', email);
+    localStorage.setItem('nrh_current', email);// Fix old users who have no code yet
+if(!user.myCode){
+  user.myCode = (user.name.split(' ')[0].toUpperCase().replace(/[^A-Z]/g,'') + Math.floor(1000 + Math.random()*9000));
+  var allUsers = JSON.parse(localStorage.getItem('nrh_users') || '[]');
+  var idx = allUsers.findIndex(u=>u.email===user.email);
+  if(idx>-1){ allUsers[idx]=user; localStorage.setItem('nrh_users', JSON.stringify(allUsers)); }
+}
     alert('Welcome back '+user.name+' 👋');
     show('dashboard');
     var nameEl = document.getElementById('dashName');
