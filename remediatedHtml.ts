@@ -1,0 +1,641 @@
+export const fullyRemediatedHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#15803d">
+  <meta name="description" content="NaijaRemoteHub — Learn remote skills, earn with referrals, transfer funds peer-to-peer, and earn points with tasks.">
+  <title>NaijaRemoteHub | Learn. Earn. Grow.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    :root { color-scheme: light; }
+    html { scroll-behavior: smooth; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    
+    .page { display: none; }
+    .page.active { display: block; }
+    .tab-active { background: #15803d; color: white; }
+    .tab-idle { background: #f3f4f6; color: #1f2937; }
+    
+    .shadow-soft { box-shadow: 0 12px 35px rgba(15, 23, 42, .08); }
+    
+    .field {
+      width: 100%;
+      border: 1px solid #94a3b8;
+      border-radius: .75rem;
+      padding: .8rem .9rem;
+      outline: none;
+      background: white;
+      color: #0f172a;
+    }
+    .field:focus-visible {
+      border-color: #15803d;
+      outline: 2px solid #15803d;
+      outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(21, 128, 61, .2);
+    }
+    .field[aria-invalid="true"] {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .btn {
+      border-radius: .75rem;
+      padding: .8rem 1.1rem;
+      font-weight: 700;
+      transition: background-color .15s, outline-offset .15s;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    
+    button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible {
+      outline: 3px solid #15803d;
+      outline-offset: 2px;
+    }
+    .btn-green { background: #15803d; color: white; }
+    .btn-green:hover { background: #166534; }
+    .btn-green:focus-visible { outline-color: #facc15; }
+    
+    .btn-yellow { background: #eab308; color: #052e16; font-weight: 800; }
+    .btn-yellow:hover { background: #ca8a04; }
+    
+    .btn-light { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
+    .btn-light:hover { background: #e2e8f0; }
+
+    .notice {
+      display: none;
+      border-radius: .75rem;
+      padding: .85rem 1.1rem;
+      font-size: .95rem;
+      font-weight: 500;
+      margin-top: .75rem;
+    }
+    .notice.show { display: block; }
+    .notice.error { background: #fef2f2; color: #991b1b; border: 1px solid #f87171; }
+    .notice.success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: .25rem .75rem;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .025em;
+    }
+    .locked { background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 1px dashed #94a3b8; }
+    button, a, input, textarea, select { touch-action: manipulation; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-green-200">
+
+<!-- Skip Link for Accessibility -->
+<a href="#main-content" 
+   class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3 focus:bg-green-800 focus:text-white focus:rounded-xl focus:shadow-2xl focus:ring-4 focus:ring-yellow-400 font-extrabold text-sm">
+  Skip to main content
+</a>
+
+<div id="routeAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="globalToast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Primary Navigation Header -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="#home" onclick="showPage('home'); return false;" 
+       aria-label="NaijaRemoteHub, go to homepage" 
+       class="flex items-center gap-2 min-w-0 rounded-xl p-1">
+      <span class="w-10 h-10 rounded-xl bg-green-700 text-white grid place-items-center font-black text-xl shadow-xs" aria-hidden="true">N</span>
+      <span class="font-extrabold tracking-tight text-green-900 text-lg sm:text-xl">NaijaRemoteHub</span>
+    </a>
+    
+    <nav aria-label="Primary navigation" class="flex items-center gap-1 sm:gap-2 text-sm">
+      <button id="navHome" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-green-900" aria-current="page" onclick="showPage('home')">Home</button>
+      <button id="navTasks" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('tasks')">Tasks & Points</button>
+      <button id="navLogin" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="openAuth('login')">Login</button>
+      <button id="navDashboard" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('dashboard')">Dashboard</button>
+      <button id="navAdmin" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('admin')">Admin</button>
+      <button id="navLogout" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold text-red-700 hover:bg-red-50" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content" tabindex="-1" class="outline-none">
+  <!-- ==================== HOME VIEW ==================== -->
+  <section id="home" class="page active" aria-labelledby="homeHeroHeading">
+    <div class="bg-gradient-to-br from-green-900 via-green-800 to-green-700 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="inline-block bg-slate-950/70 border border-yellow-300/50 text-yellow-300 rounded-full px-4 py-1.5 text-sm font-extrabold mb-5 shadow-sm">
+            Learn · Earn · Transfer Peer-to-Peer
+          </span>
+          <h1 id="homeHeroHeading" class="text-5xl sm:text-6xl font-black leading-tight tracking-tight">
+            Learn. Earn.<br><span class="text-yellow-300">Grow.</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-green-50 mt-5 max-w-xl font-normal leading-relaxed">
+            Acquire high-income digital skills, earn points on daily tasks, and transfer funds between hub members at ₦0 fee.
+          </p>
+          <div class="flex flex-wrap gap-3 mt-8">
+            <button class="btn btn-yellow shadow-md" onclick="openAuth('signup')">Create Free Account</button>
+            <button class="btn bg-white text-green-900 hover:bg-green-50 font-bold" onclick="showPage('tasks')">Explore Tasks to Earn</button>
+          </div>
+        </div>
+        
+        <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100">
+          <p class="text-green-800 font-bold uppercase tracking-widest text-xs">Platform Highlights</p>
+          <h2 class="text-2xl font-extrabold mt-2 text-slate-900">Your All-in-One Digital Career Hub</h2>
+          <ul class="grid grid-cols-2 gap-3 mt-6" role="list">
+            <li class="bg-green-50 rounded-2xl p-4 border border-green-100">
+              <span class="text-2xl" aria-hidden="true">💸</span>
+              <b class="block mt-2 text-slate-900">P2P Transfers</b>
+              <span class="text-sm text-slate-600">Send money directly to members</span>
+            </li>
+            <li class="bg-yellow-50 rounded-2xl p-4 border border-yellow-100">
+              <span class="text-2xl" aria-hidden="true">⭐</span>
+              <b class="block mt-2 text-slate-900">Task Points</b>
+              <span class="text-sm text-slate-600">Daily streak & quizzes to earn</span>
+            </li>
+            <li class="bg-slate-100 rounded-2xl p-4 border border-slate-200">
+              <span class="text-2xl" aria-hidden="true">📊</span>
+              <b class="block mt-2 text-slate-900">Enhanced Stats</b>
+              <span class="text-sm text-slate-600">Deep wallet & referral metrics</span>
+            </li>
+            <li class="bg-green-50 rounded-2xl p-4 border border-green-100">
+              <span class="text-2xl" aria-hidden="true">🎓</span>
+              <b class="block mt-2 text-slate-900">Digital Academy</b>
+              <span class="text-sm text-slate-600">Practical freelance courses</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ENHANCED DASHBOARD VIEW ==================== -->
+  <section id="dashboard" class="page" aria-labelledby="dashboardHeading">
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <!-- Member Overview Header -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="text-green-800 font-bold text-sm tracking-wide">MEMBER AREA · SILVER TIER</p>
+            <h1 id="dashboardHeading" class="text-3xl font-black text-slate-900">Your Enhanced Dashboard</h1>
+            <p id="memberGreeting" class="text-slate-600 mt-1"></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="accountBadge" class="pill bg-slate-200 text-slate-800" aria-live="polite">FREE ACCOUNT</span>
+            <button class="btn btn-yellow text-xs px-3 py-1.5" onclick="showPage('tasks')">⭐ Tasks to Earn Points</button>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
+          <div class="bg-green-900 text-white rounded-2xl p-5 shadow-soft flex flex-col justify-between">
+            <div>
+              <p class="text-green-100 text-xs font-semibold uppercase">Wallet Balance</p>
+              <p id="walletBalance" class="text-3xl font-black mt-1 text-white">₦0</p>
+            </div>
+            <div class="flex gap-2 mt-4 pt-3 border-t border-green-800">
+              <button class="btn btn-yellow text-xs py-1.5 flex-1" onclick="openTransferModal()">Send Money</button>
+              <button class="btn bg-white/20 text-white text-xs py-1.5 flex-1" onclick="document.getElementById('withdrawSection').scrollIntoView({behavior:'smooth'})">Withdraw</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Reward Points</p>
+              <p id="pointsBalance" class="text-3xl font-black text-amber-600 mt-1">850 Pts</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Worth: <strong id="pointsWorth">₦4,250</strong></p>
+            </div>
+            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="showPage('tasks')">Redeem for Cash</button>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Peer Transfers</p>
+              <p id="p2pCount" class="text-3xl font-black text-slate-900 mt-1">0 Sent</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">₦0 transfer fees</p>
+            </div>
+            <button class="btn btn-green text-xs py-1.5 mt-3" onclick="openTransferModal()">Transfer to Member</button>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Your Referral Code</p>
+              <p id="myRefCode" class="text-2xl font-black text-green-800 mt-1 break-all">—</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Total Referrals: <strong id="referralCount">0</strong></p>
+            </div>
+            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="copyReferral()">Copy Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Transfer & Ledger Grid -->
+      <div class="grid lg:grid-cols-12 gap-6">
+        <!-- Left: Quick Actions -->
+        <div className="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+            <h2 class="font-extrabold text-lg text-slate-900">P2P Member Transfer</h2>
+            <p class="text-xs text-slate-600 mt-1">Send funds directly to any member using their referral code.</p>
+            <button class="btn btn-green w-full mt-4" onclick="openTransferModal()">
+              💸 Send Money to Member
+            </button>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+            <h2 id="refHeading" class="font-extrabold text-lg text-slate-900">Your Referral Hub</h2>
+            <div class="flex gap-2 mt-4">
+              <label for="referralLink" class="sr-only">Your referral link</label>
+              <input id="referralLink" aria-labelledby="refHeading" class="field min-w-0 text-xs" readonly>
+              <button class="btn btn-green whitespace-nowrap text-xs" onclick="copyReferral()">Copy</button>
+            </div>
+            <button class="btn btn-yellow w-full mt-3 text-xs" onclick="shareWhatsApp()">Share on WhatsApp</button>
+          </div>
+        </div>
+
+        <!-- Right: Recent Transfer Ledger -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 class="font-extrabold text-lg text-slate-900">Recent Peer Transfers</h2>
+            <span class="text-xs font-bold text-green-800">Instant Settlement</span>
+          </div>
+          <div id="transferLedger" class="mt-4 space-y-3">
+            <p class="text-xs text-slate-500">No transfers sent yet. Click &quot;Send Money to Member&quot; to transfer.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Withdrawal Section -->
+      <div id="withdrawSection" class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+        <h2 class="font-extrabold text-lg text-slate-900">Request Bank Withdrawal</h2>
+        <p class="text-xs text-slate-500 mt-1">Minimum withdrawal: ₦5,000.</p>
+        <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)" novalidate>
+          <div>
+            <label for="bankName" class="text-xs font-bold block mb-1">Bank Name *</label>
+            <input id="bankName" class="field text-xs" required maxlength="80">
+          </div>
+          <div>
+            <label for="accountNumber" class="text-xs font-bold block mb-1">Account Number (10 digits) *</label>
+            <input id="accountNumber" class="field text-xs" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+          </div>
+          <div>
+            <label for="withdrawAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
+            <input id="withdrawAmount" class="field text-xs" type="number" min="5000" required>
+          </div>
+          <div class="flex items-end">
+            <button id="withdrawSubmit" class="btn btn-green w-full text-xs" type="submit">Submit Withdrawal</button>
+          </div>
+        </form>
+        <div id="withdrawMessage" class="notice" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TASKS TO EARN POINTS VIEW ==================== -->
+  <section id="tasks" class="page" aria-labelledby="tasksHeading">
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white rounded-3xl p-6 sm:p-8 shadow-soft">
+        <h1 id="tasksHeading" class="text-3xl font-black">Tasks to Earn Points</h1>
+        <p class="text-xs sm:text-sm text-amber-100 mt-1 max-w-xl">
+          Complete daily attendance, community tasks, and freelancing quizzes to earn reward points. Convert 500 Points to ₦2,500 cash in your wallet!
+        </p>
+        <div class="flex flex-wrap items-center gap-4 mt-5">
+          <button class="btn btn-yellow text-xs" onclick="claimDailyStreak()">🔥 Claim Daily +50 Pts</button>
+          <button class="btn bg-white/20 text-white text-xs" onclick="redeemPointsToCash()">💰 Convert 500 Pts to ₦2,500</button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+100 PTS</span><span class="text-xs text-slate-500 font-bold">SOCIAL</span></div>
+          <h3 class="font-extrabold text-base mt-2">Share Referral on WhatsApp</h3>
+          <p class="text-xs text-slate-600 mt-1">Spread the word to your freelancer groups.</p>
+          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('whatsapp', 100)">Share & Claim +100 Pts</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">COMMUNITY</span></div>
+          <h3 class="font-extrabold text-base mt-2">Join Telegram Community Channel</h3>
+          <p class="text-xs text-slate-600 mt-1">Connect with 12,000+ Nigerian remote workers.</p>
+          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('telegram', 150)">Join & Claim +150 Pts</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+250 PTS</span><span class="text-xs text-slate-500 font-bold">SKILL QUIZ</span></div>
+          <h3 class="font-extrabold text-base mt-2">Freelancing & Upwork Readiness Quiz</h3>
+          <p class="text-xs text-slate-600 mt-1">Answer 3 questions on proposal writing & escrow safety.</p>
+          <button class="btn btn-yellow text-xs w-full mt-4" onclick="openQuizModal()">Take Quiz (+250 Pts)</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">MILESTONE</span></div>
+          <h3 class="font-extrabold text-base mt-2">Make Your First P2P Transfer</h3>
+          <p class="text-xs text-slate-600 mt-1">Transfer funds to a member to unlock peer bonuses.</p>
+          <button class="btn btn-light text-xs w-full mt-4" onclick="openTransferModal()">Transfer Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== AUTH VIEW ==================== -->
+  <section id="auth" class="page" aria-labelledby="authHeading">
+    <div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-6 sm:p-8 border border-slate-100">
+        <h1 id="authHeading" class="text-2xl font-black text-center text-slate-900">Welcome to NaijaRemoteHub</h1>
+        <div role="tablist" class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl mt-6">
+          <button id="loginTab" role="tab" class="btn tab-active" onclick="switchAuth('login')">Login</button>
+          <button id="signupTab" role="tab" class="btn tab-idle" onclick="switchAuth('signup')">Sign Up</button>
+        </div>
+        <form id="loginForm" class="mt-6 space-y-4" onsubmit="login(event)">
+          <div><label for="loginEmail" class="text-xs font-bold block mb-1">Email *</label><input id="loginEmail" class="field text-sm" type="email" required></div>
+          <div><label for="loginPassword" class="text-xs font-bold block mb-1">Password *</label><input id="loginPassword" class="field text-sm" type="password" required></div>
+          <button class="btn btn-green w-full" type="submit">Login</button>
+          <div id="loginError" class="notice error" role="alert" aria-live="assertive"></div>
+        </form>
+        <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
+          <div><label for="signupName" class="text-xs font-bold block mb-1">Full Name *</label><input id="signupName" class="field text-sm" required></div>
+          <div><label for="signupEmail" class="text-xs font-bold block mb-1">Email *</label><input id="signupEmail" class="field text-sm" type="email" required></div>
+          <div><label for="signupPassword" class="text-xs font-bold block mb-1">Password *</label><input id="signupPassword" class="field text-sm" type="password" minlength="6" required></div>
+          <div><label for="signupReferral" class="text-xs font-bold block mb-1">Referral Code (optional)</label><input id="signupReferral" class="field text-sm" placeholder="e.g. chioma23"></div>
+          <button class="btn btn-green w-full" type="submit">Create Account</button>
+          <div id="signupError" class="notice error" role="alert" aria-live="assertive"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Transfer Modal (Supports Naira & P2P Points) -->
+<div id="transferModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+      <h3 id="transferModalTitle" class="font-black text-base text-slate-900">Transfer Funds / Points to Member</h3>
+      <button onclick="closeTransferModal()" class="text-slate-400 hover:text-slate-800" aria-label="Close transfer modal">✕</button>
+    </div>
+
+    <!-- Asset Toggle -->
+    <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl my-3 text-xs font-bold">
+      <button type="button" id="tabSendNaira" onclick="setTransferMode('naira')" class="py-1.5 rounded-lg bg-green-800 text-white">Send Naira (₦)</button>
+      <button type="button" id="tabSendPts" onclick="setTransferMode('points')" class="py-1.5 rounded-lg text-slate-700">Send Points (Pts)</button>
+    </div>
+
+    <form class="space-y-3" onsubmit="submitTransfer(event)">
+      <div>
+        <label for="transferRecipient" class="text-xs font-bold block mb-1">Recipient Referral Code or Email *</label>
+        <input id="transferRecipient" class="field text-xs" placeholder="e.g. chioma23 or tunde88" required>
+      </div>
+      <div>
+        <label id="transferAmountLabel" for="transferAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
+        <input id="transferAmount" type="number" min="500" class="field text-xs" placeholder="Min ₦500" required>
+      </div>
+      <div>
+        <label for="transferPin" class="text-xs font-bold block mb-1">4-Digit Security PIN (Default: 1234) *</label>
+        <input id="transferPin" type="password" maxlength="4" class="field text-xs text-center font-bold tracking-widest" required>
+      </div>
+      <button id="transferSubmitBtn" class="btn btn-green w-full text-xs" type="submit">Authorize &amp; Send Transfer</button>
+      <div id="transferModalMessage" class="notice"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+let localPoints = 850;
+let localBalance = 45000;
+let currentTransferMode = "naira";
+let transfersList = [];
+
+function showToast(msg) {
+  const t = document.getElementById("globalToast");
+  t.textContent = msg;
+  t.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl bg-green-900 text-white font-bold text-xs shadow-xl";
+  setTimeout(() => { t.className = "hidden"; }, 3500);
+}
+
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const target = document.getElementById(page);
+  if (target) target.classList.add("active");
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function setTransferMode(mode) {
+  currentTransferMode = mode;
+  const nairaTab = document.getElementById("tabSendNaira");
+  const ptsTab = document.getElementById("tabSendPts");
+  const amtInput = document.getElementById("transferAmount");
+  const amtLabel = document.getElementById("transferAmountLabel");
+  const submitBtn = document.getElementById("transferSubmitBtn");
+  const title = document.getElementById("transferModalTitle");
+
+  if (mode === "points") {
+    nairaTab.className = "py-1.5 rounded-lg text-slate-700";
+    ptsTab.className = "py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black";
+    amtLabel.textContent = "Points to Transfer (Pts) * (Available: " + localPoints.toLocaleString() + " Pts)";
+    amtInput.min = "50";
+    amtInput.placeholder = "Min 50 Pts";
+    submitBtn.textContent = "Send Points P2P";
+    title.textContent = "P2P Points Transfer";
+  } else {
+    ptsTab.className = "py-1.5 rounded-lg text-slate-700";
+    nairaTab.className = "py-1.5 rounded-lg bg-green-800 text-white font-bold";
+    amtLabel.textContent = "Amount (₦) * (Available: ₦" + localBalance.toLocaleString() + ")";
+    amtInput.min = "500";
+    amtInput.placeholder = "Min ₦500";
+    submitBtn.textContent = "Authorize & Send Transfer";
+    title.textContent = "Transfer Funds to Member";
+  }
+}
+
+function openTransferModal(mode) {
+  setTransferMode(mode || "naira");
+  document.getElementById("transferModal").classList.remove("hidden");
+}
+function closeTransferModal() {
+  document.getElementById("transferModal").classList.add("hidden");
+}
+
+function submitTransfer(e) {
+  e.preventDefault();
+  const rec = document.getElementById("transferRecipient").value.trim();
+  const amt = Number(document.getElementById("transferAmount").value);
+  const pin = document.getElementById("transferPin").value.trim();
+
+  if (pin !== "1234") {
+    alert("Invalid Security PIN. Default test PIN is 1234.");
+    return;
+  }
+
+  if (currentTransferMode === "points") {
+    if (amt < 50) {
+      alert("Minimum P2P points transfer is 50 Points.");
+      return;
+    }
+    if (amt > localPoints) {
+      alert("Insufficient points balance. You have " + localPoints.toLocaleString() + " Pts available.");
+      return;
+    }
+
+    localPoints -= amt;
+    updatePointsUI();
+    closeTransferModal();
+    showToast("Transferred " + amt.toLocaleString() + " Points to " + rec + " via P2P!");
+    return;
+  }
+
+  if (amt > localBalance) {
+    alert("Insufficient wallet balance.");
+    return;
+  }
+
+  localBalance -= amt;
+  transfersList.unshift({
+    id: "TXN-" + Math.floor(100000 + Math.random() * 900000),
+    recipient: rec,
+    amount: amt,
+    time: new Date().toLocaleTimeString()
+  });
+
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  renderLedger();
+  closeTransferModal();
+  showToast("Transfer of ₦" + amt.toLocaleString() + " to " + rec + " successful!");
+}
+
+function renderLedger() {
+  const container = document.getElementById("transferLedger");
+  if (!transfersList.length) return;
+  container.innerHTML = transfersList.map(t => \`
+    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
+      <div>
+        <p class="text-xs font-bold text-slate-900">Sent to \${t.recipient}</p>
+        <p class="text-[10px] text-slate-500">\${t.id} · \${t.time}</p>
+      </div>
+      <p class="text-xs font-black text-slate-900">-₦\${t.amount.toLocaleString()}</p>
+    </div>
+  \`).join("");
+}
+
+function claimDailyStreak() {
+  localPoints += 50;
+  updatePointsUI();
+  showToast("Daily Attendance Claimed! +50 Points added.");
+}
+
+function claimSocialTask(type, pts) {
+  localPoints += pts;
+  updatePointsUI();
+  showToast("Task completed! +" + pts + " Points awarded.");
+}
+
+function buyPointsWithCash() {
+  const pts = Number(prompt("Enter amount of points to BUY with your Naira wallet balance (e.g. 200, 500, 1000):\\nRate: 1 Point = ₦" + nairaRate, "200"));
+  if (!pts || pts < 100) {
+    if (pts) alert("Minimum purchase is 100 points.");
+    return;
+  }
+  const cost = pts * nairaRate;
+  if (cost > localBalance) {
+    alert("Insufficient wallet balance. You need ₦" + cost.toLocaleString() + " but have ₦" + localBalance.toLocaleString());
+    return;
+  }
+  localBalance -= cost;
+  localPoints += pts;
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  updatePointsUI();
+  showToast("Bought +" + pts.toLocaleString() + " Points for ₦" + cost.toLocaleString() + " for special activities!");
+}
+
+let nairaRate = 5;
+
+function redeemPointsToCash() {
+  const pts = Number(prompt("Enter amount of points to REDEEM for wallet cash (Min 200 points):\\nRate: 1 Point = ₦" + nairaRate, "500"));
+  if (!pts || pts < 200) {
+    if (pts) alert("Minimum redemption is 200 points.");
+    return;
+  }
+  if (pts > localPoints) {
+    alert("Insufficient points balance. You have " + localPoints.toLocaleString() + " points.");
+    return;
+  }
+  const cash = pts * nairaRate;
+  localPoints -= pts;
+  localBalance += cash;
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  updatePointsUI();
+  showToast("Redeemed " + pts.toLocaleString() + " Points for ₦" + cash.toLocaleString() + " wallet cash!");
+}
+
+function adminIssueBurnAction() {
+  const action = prompt("ADMIN ACTION: Type 'ISSUE' to grant points or 'BURN' to deduct points from a member:").toUpperCase();
+  if (action !== "ISSUE" && action !== "BURN") return;
+  const member = prompt("Enter Member Referral Code (e.g. chioma23, tunde88, or your code):");
+  if (!member) return;
+  const pts = Number(prompt("Enter points amount to " + action + ":", "150"));
+  if (!pts || pts <= 0) return;
+  const pin = prompt("Enter 4-digit Admin PIN (Default: 1234):");
+  if (pin !== "1234") {
+    alert("Unauthorized. Invalid admin PIN.");
+    return;
+  }
+  if (action === "ISSUE") {
+    localPoints += pts;
+    showToast("Admin issued +" + pts + " points to " + member);
+  } else {
+    localPoints = Math.max(0, localPoints - pts);
+    showToast("Admin burned -" + pts + " points from " + member);
+  }
+  updatePointsUI();
+}
+
+function adminEditConversionRate() {
+  const newRate = Number(prompt("ADMIN CONFIG: Enter new exchange rate (Naira value per 1 Point):", String(nairaRate)));
+  if (!newRate || newRate <= 0) return;
+  const pin = prompt("Enter 4-digit Admin PIN (Default: 1234):");
+  if (pin !== "1234") {
+    alert("Unauthorized. Invalid admin PIN.");
+    return;
+  }
+  nairaRate = newRate;
+  updatePointsUI();
+  showToast("Admin updated exchange rate: 1 Point = ₦" + nairaRate + " NGN");
+}
+
+function updatePointsUI() {
+  document.getElementById("pointsBalance").textContent = localPoints.toLocaleString() + " Pts";
+  document.getElementById("pointsWorth").textContent = "₦" + (localPoints * nairaRate).toLocaleString();
+}
+
+function openQuizModal() {
+  const ans = prompt("Quiz Question: In Upwork, should you communicate outside the platform before a contract is funded?\\nType: YES or NO");
+  if (ans && ans.trim().toUpperCase() === "NO") {
+    localPoints += 250;
+    updatePointsUI();
+    showToast("Correct answer! +250 Points awarded for Freelance Quiz!");
+  } else if (ans) {
+    alert("Incorrect. Never communicate outside Upwork before a funded contract to protect your account.");
+  }
+}
+
+function copyReferral() {
+  showToast("Referral link copied to clipboard!");
+}
+function shareWhatsApp() {
+  window.open("https://wa.me/?text=Join%20NaijaRemoteHub", "_blank");
+}
+</script>
+</body>
+</html>`;
