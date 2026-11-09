@@ -1,0 +1,6 @@
+{
+  "name": "NaijaRemoteHub Accessibility Auditor",
+  "description": "Comprehensive WCAG 2.1/2.2 AA accessibility audit, issue explorer, remediation code diffs, and interactive accessible simulator for NaijaRemoteHub.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
